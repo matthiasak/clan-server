@@ -1,0 +1,59 @@
+{
+  "name": "clan-server",
+  "version": "0.0.13",
+  "description": "A functional, observable-and-worker-backed hyper simple framework with slightly opinionated use-cases",
+  "main": "build/server.js",
+  "module": "src/server.js",
+  "scripts": {
+    "prestart": "rimraf build/*",
+    "start": "webpack --watch",
+    "now-start": "node build/test",
+    "prebuild": "rimraf build/*",
+    "build": "cross-env NODE_ENV=production webpack",
+    "deploy": "npm run build; git add .; git commit -am \"comitting and pushing new patch version\"; npm version patch; git push origin master; npm publish;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/matthiasak/clan-server"
+  },
+  "keywords": [
+    "fp",
+    "observables",
+    "immutable",
+    "data",
+    "server"
+  ],
+  "author": "@matthiasak",
+  "license": "MIT",
+  "devDependencies": {
+    "@terse/webpack": "^1.0.6",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "cross-env": "^3.1.3",
+    "ghooks": "^1.3.2",
+    "now": "^0.33.0",
+    "npm-run-all": "^3.1.1",
+    "optimize-js-plugin": "^0.0.4",
+    "rimraf": "^2.5.4",
+    "start-server-webpack-plugin": "^2.1.1",
+    "webpack": "^2.1.0-beta",
+    "yarn": "^0.17.9"
+  },
+  "dependencies": {
+    "clan-fp": "^0.0.16"
+  },
+  "engines": {
+    "node": ">=7"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "opt --in pre-commit --exec 'npm test'",
+      "pre-push": "npm test",
+      "post-merge": "yarn",
+      "post-rewrite": "yarn"
+    }
+  }
+}
