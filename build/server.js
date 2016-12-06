@@ -181,7 +181,7 @@ const route = type => (url, action) => context => {
 		context.__handled = true;
 
 		const params = v.slice(1),
-		      query = qs.parse(req.url.slice(i));
+		      query = qs.parse(req.url.slice(i + 1));
 
 		action(_extends({}, context, { params, query }));
 	}
