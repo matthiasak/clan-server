@@ -1,6 +1,6 @@
 {
   "name": "clan-server",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A functional, observable-and-worker-backed hyper simple framework with slightly opinionated use-cases",
   "main": "build/server.js",
   "module": "src/server.js",
