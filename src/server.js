@@ -46,7 +46,7 @@ export const send = context => {
 
 			if(data instanceof Number || typeof data === 'number') {
 				res.statusCode = data
-				res.end()
+				return res.end()
 			}
 
 			if(data instanceof Object && !(data instanceof Buffer))
