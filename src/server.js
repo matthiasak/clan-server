@@ -1,8 +1,9 @@
 const zlib = require('zlib')
 	, fs = require('fs')
 	, qs = require('querystring')
+	, stream = require('stream')
+	, Buffer = require('buffer').Buffer
 	, { model, hamt, obs, worker, cof, cob, curry, batch, c, concatter, filtering, mapping, pf, rAF, vdom } = require('clan-fp')
-	// , { m, html, container } = vdom
 
 const log = (...a) => console.log(...a)
 
@@ -41,18 +42,28 @@ export const cookie = context => {
 // send middleware (adds send method to context)
 export const send = context => {
 	const s = (data, code=200) => {
-			const {req, res} = context
+		const {req, res} = context
+
+		if(data instanceof Number || typeof data === 'number') {
+			res.statusCode = data
+			return res.end()
+		} else {
 			res.statusCode = code
+		}
 
-			if(data instanceof Number || typeof data === 'number') {
-				res.statusCode = data
-				return res.end()
-			}
-
-			if(data instanceof Object && !(data instanceof Buffer))
+		if(!(data instanceof Buffer)){
+			if(data instanceof Object) {
 				data = JSON.stringify(data)
+			} else {
+				data = data.toString()
+			}
+		}
 
-			res.end(data)
+		const s = new stream.Readable()
+		s._read = () => {}
+		s.pipe(res)
+		s.push(data)
+		s.push(null)
 	}
 	return {...context, send: s}
 }

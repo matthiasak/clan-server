@@ -62,7 +62,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "/";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -73,11 +73,12 @@ module.exports =
 "use strict";
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-const zlib = __webpack_require__(6),
-      fs = __webpack_require__(2),
-      qs = __webpack_require__(5),
+const zlib = __webpack_require__(8),
+      fs = __webpack_require__(3),
+      qs = __webpack_require__(6),
+      stream = __webpack_require__(7),
+      Buffer = __webpack_require__(1).Buffer,
       { model, hamt, obs, worker, cof, cob, curry, batch, c, concatter, filtering, mapping, pf, rAF, vdom } = __webpack_require__(0);
-// , { m, html, container } = vdom
 
 const log = (...a) => console.log(...a);
 
@@ -114,16 +115,27 @@ const cookie = context => {
 const send = context => {
 	const s = (data, code = 200) => {
 		const { req, res } = context;
-		res.statusCode = code;
 
 		if (data instanceof Number || typeof data === 'number') {
 			res.statusCode = data;
 			return res.end();
+		} else {
+			res.statusCode = code;
 		}
 
-		if (data instanceof Object && !(data instanceof Buffer)) data = JSON.stringify(data);
+		if (!(data instanceof Buffer)) {
+			if (data instanceof Object) {
+				data = JSON.stringify(data);
+			} else {
+				data = data.toString();
+			}
+		}
 
-		res.end(data);
+		const s = new stream.Readable();
+		s._read = () => {};
+		s.pipe(res);
+		s.push(data);
+		s.push(null);
 	};
 	return _extends({}, context, { send: s });
 };
@@ -225,12 +237,12 @@ const serve = (folder = './', route = '/') => context => {
 
 
 const server = (pipe, port = 3000, useCluster = false) => {
-	const http = __webpack_require__(3);
+	const http = __webpack_require__(4);
 
 	if (!useCluster) return http.createServer((req, res) => pipe({ req, res })).listen(port, err => err && console.error(err) || console.log(`Server running at :${ port } on process ${ process.pid }`));
 
-	const cluster = __webpack_require__(1),
-	      numCPUs = __webpack_require__(4).cpus().length;
+	const cluster = __webpack_require__(2),
+	      numCPUs = __webpack_require__(5).cpus().length;
 
 	if (cluster.isMaster) {
 		for (var i = 0; i < numCPUs; i++) cluster.fork();
@@ -255,46 +267,60 @@ module.exports = require("clan-fp");
 /***/ 1:
 /***/ function(module, exports) {
 
-module.exports = require("cluster");
+module.exports = require("buffer");
 
 /***/ },
 
 /***/ 2:
 /***/ function(module, exports) {
 
-module.exports = require("fs");
+module.exports = require("cluster");
 
 /***/ },
 
 /***/ 3:
 /***/ function(module, exports) {
 
-module.exports = require("http");
+module.exports = require("fs");
 
 /***/ },
 
 /***/ 4:
 /***/ function(module, exports) {
 
-module.exports = require("os");
+module.exports = require("http");
 
 /***/ },
 
 /***/ 5:
 /***/ function(module, exports) {
 
-module.exports = require("querystring");
+module.exports = require("os");
 
 /***/ },
 
 /***/ 6:
 /***/ function(module, exports) {
 
-module.exports = require("zlib");
+module.exports = require("querystring");
 
 /***/ },
 
 /***/ 7:
+/***/ function(module, exports) {
+
+module.exports = require("stream");
+
+/***/ },
+
+/***/ 8:
+/***/ function(module, exports) {
+
+module.exports = require("zlib");
+
+/***/ },
+
+/***/ 9:
 /***/ function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__("./src/server.js");
