@@ -131,11 +131,7 @@ const send = context => {
 			}
 		}
 
-		const s = new stream.Readable();
-		s._read = () => {};
-		s.pipe(res);
-		s.push(data);
-		s.push(null);
+		res.end(data);
 	};
 	return _extends({}, context, { send: s });
 };
