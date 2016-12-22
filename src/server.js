@@ -7,10 +7,6 @@ const zlib = require('zlib')
 
 const log = (...a) => console.log(...a)
 
-if(module.hot){
-	module.hot.accept()
-}
-
 // cookie middleware
 export const cookie = context => {
 	const c = (key=undefined, val=undefined) => {

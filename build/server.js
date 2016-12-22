@@ -82,10 +82,6 @@ const zlib = __webpack_require__(8),
 
 const log = (...a) => console.log(...a);
 
-if (false) {
-	module.hot.accept();
-}
-
 // cookie middleware
 const cookie = context => {
 	const c = (key = undefined, val = undefined) => {
