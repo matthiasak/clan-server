@@ -46,7 +46,7 @@ export const send = context => {
 
 		if(data instanceof Number || typeof data === 'number') {
 			res.statusCode = data
-			return res.end()
+			return res.end('')
 		} else {
 			res.statusCode = code
 		}
@@ -59,22 +59,48 @@ export const send = context => {
 			}
 		}
 
-		res.end(data)
+		res.end(data || '')
 	}
 	return {...context, send: s}
 }
 
-// send file middleware (adds sendFIle middleware to context)
+// send file middleware (adds sendFile method to context)
 export const sendFile = context => {
 	const s = file => {
 		const {req, res} = context
 		res.statusCode = 200
+		addMIME(file, res)
 		file instanceof Buffer
 			? Buffer.from(file).pipe(res)
 			: fs.createReadStream(file).pipe(res)
 	}
 
 	return {...context, sendFile: s}
+}
+
+// benchmark handler
+export const benchmark = message => context => {
+	let before = +new Date
+	context.res.on('finish', () => {
+		let after = +new Date
+		console.log(req.url + ' --- ' + (message ? message+':' : '', after-before+'ms'))
+	})
+	return context
+}
+
+// parse data streams from req body
+export const body = (ctx) => {
+	ctx.body = new Promise((res,rej) => {
+		let {req} = ctx
+		let buf = ''
+		req.setEncoding('utf8')
+		req.on('data', c => buf += c)
+		req.on('end', _ => {
+			ctx.body = () => Promise.Resolve(buf)
+			res(buf)
+		})
+	})
+	return ctx
 }
 
 // compression middleware (modifies context with a new send method)
@@ -140,12 +166,24 @@ export const serve = (folder='./', route='/') => context => {
 	return new Promise((y, n) =>
 		fs.stat(filepath, (err, stats) => {
 			if(!err && stats.isFile()){
+				addMIME(url, res)
 				fs.createReadStream(filepath).pipe(res)
 				return n(context)
 			}
-
 			y(context)
 		}))
+}
+
+const addMIME = (url, res, type) => {
+		url.match(/\.js$/) && res.setHeader('Content-Type', 'text/javascript')
+		url.match(/\.json$/) && res.setHeader('Content-Type', 'application/json')
+		url.match(/\.pdf$/) && res.setHeader('Content-Type', 'application/pdf')
+		url.match(/\.html$/) && res.setHeader('Content-Type', 'text/html')
+		url.match(/\.css$/) && res.setHeader('Content-Type', 'text/css')
+
+		url.match(/\.jpe?g$/) && res.setHeader('Content-Type', 'image/jpeg')
+		url.match(/\.png$/) && res.setHeader('Content-Type', 'image/png')
+		url.match(/\.gif$/) && res.setHeader('Content-Type', 'image/gif')
 }
 
 export const server = (pipe, port=3000, useCluster=false) => {
@@ -174,3 +212,5 @@ export const server = (pipe, port=3000, useCluster=false) => {
 				|| console.log(`Server running at :${port} on process ${process.pid}`))
 	}
 }
+
+export const http = server

@@ -3,7 +3,7 @@ let config =
 	.api()
     .entry({
     	server: "./src/server.js"
-    	, test: "./src/test.js"
+    	// , test: "./src/test.js"
     })
     .loader(
     	'babel'
@@ -27,13 +27,14 @@ let config =
     	api
             .entry({
                 server: [
-                    "webpack/hot/poll?300"
-                    , "./src/server.js"
+                    // "webpack/hot/poll?300"
+                    "./src/server.js"
                 ]
-                , test: "./src/test.js"
+                // , test: "./src/test.js"
             })
-            .plugin("webpack.HotModuleReplacementPlugin")
-            .plugin('start-server-webpack-plugin', 'test.js'))
+            // .plugin("webpack.HotModuleReplacementPlugin")
+            // .plugin('start-server-webpack-plugin', 'test.js')
+        )
     .getConfig()
 
 module.exports = config

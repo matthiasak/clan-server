@@ -77,8 +77,8 @@ const zlib = __webpack_require__(8),
       fs = __webpack_require__(3),
       qs = __webpack_require__(6),
       stream = __webpack_require__(7),
-      Buffer = __webpack_require__(1).Buffer,
-      { model, hamt, obs, worker, cof, cob, curry, batch, c, concatter, filtering, mapping, pf, rAF, vdom } = __webpack_require__(0);
+      Buffer = __webpack_require__(0).Buffer,
+      { model, hamt, obs, worker, cof, cob, curry, batch, c, concatter, filtering, mapping, pf, rAF, vdom } = __webpack_require__(1);
 
 const log = (...a) => console.log(...a);
 
@@ -118,7 +118,7 @@ const send = context => {
 
 		if (data instanceof Number || typeof data === 'number') {
 			res.statusCode = data;
-			return res.end();
+			return res.end('');
 		} else {
 			res.statusCode = code;
 		}
@@ -131,24 +131,54 @@ const send = context => {
 			}
 		}
 
-		res.end(data);
+		res.end(data || '');
 	};
 	return _extends({}, context, { send: s });
 };
 /* harmony export (immutable) */ exports["send"] = send;
 
 
-// send file middleware (adds sendFIle middleware to context)
+// send file middleware (adds sendFile method to context)
 const sendFile = context => {
 	const s = file => {
 		const { req, res } = context;
 		res.statusCode = 200;
+		addMIME(file, res);
 		file instanceof Buffer ? Buffer.from(file).pipe(res) : fs.createReadStream(file).pipe(res);
 	};
 
 	return _extends({}, context, { sendFile: s });
 };
 /* harmony export (immutable) */ exports["sendFile"] = sendFile;
+
+
+// benchmark handler
+const benchmark = message => context => {
+	let before = +new Date();
+	context.res.on('finish', () => {
+		let after = +new Date();
+		console.log(req.url + ' --- ' + (message ? message + ':' : '', after - before + 'ms'));
+	});
+	return context;
+};
+/* harmony export (immutable) */ exports["benchmark"] = benchmark;
+
+
+// parse data streams from req body
+const body = ctx => {
+	ctx.body = new Promise((res, rej) => {
+		let { req } = ctx;
+		let buf = '';
+		req.setEncoding('utf8');
+		req.on('data', c => buf += c);
+		req.on('end', _ => {
+			ctx.body = () => Promise.Resolve(buf);
+			res(buf);
+		});
+	});
+	return ctx;
+};
+/* harmony export (immutable) */ exports["body"] = body;
 
 
 // compression middleware (modifies context with a new send method)
@@ -222,15 +252,27 @@ const serve = (folder = './', route = '/') => context => {
 
 	return new Promise((y, n) => fs.stat(filepath, (err, stats) => {
 		if (!err && stats.isFile()) {
+			addMIME(url, res);
 			fs.createReadStream(filepath).pipe(res);
 			return n(context);
 		}
-
 		y(context);
 	}));
 };
 /* harmony export (immutable) */ exports["serve"] = serve;
 
+
+const addMIME = (url, res, type) => {
+	url.match(/\.js$/) && res.setHeader('Content-Type', 'text/javascript');
+	url.match(/\.json$/) && res.setHeader('Content-Type', 'application/json');
+	url.match(/\.pdf$/) && res.setHeader('Content-Type', 'application/pdf');
+	url.match(/\.html$/) && res.setHeader('Content-Type', 'text/html');
+	url.match(/\.css$/) && res.setHeader('Content-Type', 'text/css');
+
+	url.match(/\.jpe?g$/) && res.setHeader('Content-Type', 'image/jpeg');
+	url.match(/\.png$/) && res.setHeader('Content-Type', 'image/png');
+	url.match(/\.gif$/) && res.setHeader('Content-Type', 'image/gif');
+};
 
 const server = (pipe, port = 3000, useCluster = false) => {
 	const http = __webpack_require__(4);
@@ -251,19 +293,23 @@ const server = (pipe, port = 3000, useCluster = false) => {
 /* harmony export (immutable) */ exports["server"] = server;
 
 
+const http = server;
+/* harmony export (immutable) */ exports["http"] = http;
+
+
 /***/ },
 
 /***/ 0:
 /***/ function(module, exports) {
 
-module.exports = require("clan-fp");
+module.exports = require("buffer");
 
 /***/ },
 
 /***/ 1:
 /***/ function(module, exports) {
 
-module.exports = require("buffer");
+module.exports = require("clan-fp");
 
 /***/ },
 
