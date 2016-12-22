@@ -15,7 +15,6 @@ let config =
     .plugin("webpack.NamedModulesPlugin")
     .plugin("optimize-js-plugin")
     .plugin("webpack.NoErrorsPlugin")
-    .sourcemap("source-map")
     .externals(/^@?\w[a-z\-0-9\./]+$/)
     .output({
 		path: './build'
@@ -23,6 +22,7 @@ let config =
 		, libraryTarget: 'commonjs2'
     })
     .target("node")
+    .sourcemap("source-map")
     .when("development", api =>
     	api
             .entry({
