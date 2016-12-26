@@ -242,15 +242,17 @@ const patch = route('patch');
 
 // static file serving async-middleware
 const serve = (folder = './', route = '/') => context => {
-	const { req, res } = context,
+	const { req, res, send, sendFile } = context,
 	      { url } = req,
 	      filepath = `${ process.cwd() }/${ folder }/${ url.slice(1).replace(new RegExp(`/^${ route }/`, `ig`), '') }`.replace(/\/\//ig, '/');
 
 	return new Promise((y, n) => fs.stat(filepath, (err, stats) => {
 		if (!err && stats.isFile()) {
-			addMIME(url, res);
-			fs.createReadStream(filepath).pipe(res);
-			return n(context);
+			return fs.readFile(filepath, (err, data) => {
+				addMIME(url, res);
+				send(data.toString());
+				n(context);
+			});
 		}
 		y(context);
 	}));
