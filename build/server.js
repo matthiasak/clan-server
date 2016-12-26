@@ -107,40 +107,13 @@ const cookie = context => {
 /* harmony export (immutable) */ exports["cookie"] = cookie;
 
 
-// send middleware (adds send method to context)
-const send = context => {
-	const s = (data, code = 200) => {
-		const { req, res } = context;
-
-		if (data instanceof Number || typeof data === 'number') {
-			res.statusCode = data;
-			return res.end('');
-		} else {
-			res.statusCode = code;
-		}
-
-		if (!(data instanceof Buffer)) {
-			if (data instanceof Object) {
-				data = JSON.stringify(data);
-			} else {
-				data = data.toString();
-			}
-		}
-
-		res.end(data || '');
-	};
-	return _extends({}, context, { send: s });
-};
-/* harmony export (immutable) */ exports["send"] = send;
-
-
-// send file middleware (adds sendFile method to context)
+// send gzipped file
 const sendFile = context => {
 	const s = file => {
 		const { req, res } = context;
 		res.statusCode = 200;
 		addMIME(file, res);
-		file instanceof Buffer ? Buffer.from(file).pipe(res) : fs.createReadStream(file).pipe(res);
+		file instanceof Buffer ? streamable(file).pipe(zlib.createGzip()).pipe(res) : fs.createReadStream(file).pipe(zlib.createGzip()).pipe(res);
 	};
 
 	return _extends({}, context, { sendFile: s });
@@ -177,28 +150,52 @@ const body = ctx => {
 /* harmony export (immutable) */ exports["body"] = body;
 
 
-// compression middleware (modifies context with a new send method)
-const gzip = context => {
-	const { req, res, send } = context,
+const streamable = buf => {
+	let i = 0,
+	    s = buf.toString(),
+	    x = new stream.Readable({
+		read(size) {
+			if (i < s.length) {
+				this.push(s.slice(i, i + size));
+				i = i + size;
+			} else {
+				this.push(null);
+			}
+		}
+	});
+	return x;
+};
+
+// send gzipped response middleware
+const send = context => {
+	const { req, res } = context,
 	      e = req.headers['accept-encoding'] || '',
-	      encode = data => {
-		data = (data instanceof String || typeof data === 'string') && data || (data instanceof Number || typeof data === 'number') && data + '' || (data instanceof Boolean || typeof data === 'boolean') && data + '' || data instanceof Object && JSON.stringify(data) || data + '';
+	      s = (buffer, code = 200) => {
+		if (typeof buffer === 'number') {
+			res.statusCode = buffer;
+			return res.end('');
+		} else {
+			res.statusCode = code;
+		}
+
+		if (!(buffer instanceof Buffer)) buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer);
+
+		buffer = streamable(buffer);
 
 		if (e.match(/gzip/)) {
 			res.setHeader('content-encoding', 'gzip');
-			return zlib.gzipSync(data);
+			buffer.pipe(zlib.createGzip()).pipe(res);
 		} else if (e.match(/deflate/)) {
 			res.setHeader('content-encoding', 'deflate');
-			return zlib.deflateSync(data);
+			buffer.pipe(zlib.createDeflate()).pipe(res);
+		} else {
+			buffer.pipe(res);
 		}
+	};
 
-		return data;
-	},
-	      zip = (data, ...args) => send(encode(data), ...args);
-
-	return _extends({}, context, { send: zip });
+	return _extends({}, context, { send: s });
 };
-/* harmony export (immutable) */ exports["gzip"] = gzip;
+/* harmony export (immutable) */ exports["send"] = send;
 
 
 // routing middleware
@@ -242,19 +239,29 @@ const patch = route('patch');
 
 // static file serving async-middleware
 const serve = (folder = './', route = '/') => context => {
-	const { req, res, send, sendFile } = context,
+	const { req, res } = context,
 	      { url } = req,
-	      filepath = `${ process.cwd() }/${ folder }/${ url.slice(1).replace(new RegExp(`/^${ route }/`, `ig`), '') }`.replace(/\/\//ig, '/');
+	      filepath = `${ process.cwd() }/${ folder }/${ url.slice(1).replace(new RegExp(`/^${ route }/`, `ig`), '') }`.replace(/\/\//ig, '/'),
+	      e = req.headers['accept-encoding'] || '';
 
 	return new Promise((y, n) => fs.stat(filepath, (err, stats) => {
 		if (!err && stats.isFile()) {
-			return fs.readFile(filepath, (err, data) => {
-				addMIME(url, res);
-				send(data.toString());
-				n(context);
-			});
+			addMIME(url, res);
+
+			if (e.match(/gzip/)) {
+				res.setHeader('content-encoding', 'gzip');
+				fs.createReadStream(filepath).pipe(zlib.createGzip()).pipe(res);
+			} else if (e.match(/deflate/)) {
+				res.setHeader('content-encoding', 'deflate');
+				fs.createReadStream(filepath).pipe(zlib.createDeflate()).pipe(res);
+			} else {
+				fs.createReadStream(filepath).pipe(res);
+			}
+
+			n(context);
+		} else {
+			y(context);
 		}
-		y(context);
 	}));
 };
 /* harmony export (immutable) */ exports["serve"] = serve;

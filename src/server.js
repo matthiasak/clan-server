@@ -35,40 +35,15 @@ export const cookie = context => {
 	return {...context, cookie: c, clearCookie}
 }
 
-// send middleware (adds send method to context)
-export const send = context => {
-	const s = (data, code=200) => {
-		const {req, res} = context
-
-		if(data instanceof Number || typeof data === 'number') {
-			res.statusCode = data
-			return res.end('')
-		} else {
-			res.statusCode = code
-		}
-
-		if(!(data instanceof Buffer)){
-			if(data instanceof Object) {
-				data = JSON.stringify(data)
-			} else {
-				data = data.toString()
-			}
-		}
-
-		res.end(data || '')
-	}
-	return {...context, send: s}
-}
-
-// send file middleware (adds sendFile method to context)
+// send gzipped file
 export const sendFile = context => {
 	const s = file => {
 		const {req, res} = context
 		res.statusCode = 200
 		addMIME(file, res)
 		file instanceof Buffer
-			? Buffer.from(file).pipe(res)
-			: fs.createReadStream(file).pipe(res)
+			? streamable(file).pipe(zlib.createGzip()).pipe(res)
+			: fs.createReadStream(file).pipe(zlib.createGzip()).pipe(res)
 	}
 
 	return {...context, sendFile: s}
@@ -99,31 +74,51 @@ export const body = (ctx) => {
 	return ctx
 }
 
-// compression middleware (modifies context with a new send method)
-export const gzip = context => {
-	const { req, res, send } = context
+const streamable = buf => {
+    let i = 0
+    	, s = buf.toString()
+    	, x = new stream.Readable({
+	    	read(size) {
+	    		if(i < s.length) {
+		    		this.push(s.slice(i,i+size))
+		    		i = i+size
+		    	} else {
+		    		this.push(null)
+		    	}
+	    	}
+	    })
+    return x
+}
+
+// send gzipped response middleware
+export const send = context => {
+	const { req, res } = context
 		, e = req.headers['accept-encoding'] || ''
-		, encode = (data) => {
-			data =
-				(data instanceof String || typeof data === 'string') && data
-				|| (data instanceof Number || typeof data === 'number') && data+''
-				|| (data instanceof Boolean || typeof data === 'boolean') && data+''
-				|| data instanceof Object && JSON.stringify(data)
-				|| data+''
+		, s = (buffer, code=200) => {
+			if(typeof buffer === 'number') {
+				res.statusCode = buffer
+				return res.end('')
+			} else {
+				res.statusCode = code
+			}
+
+			if(!(buffer instanceof Buffer))
+				buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer)
+
+			buffer = streamable(buffer)
 
 			if(e.match(/gzip/)) {
 				res.setHeader('content-encoding', 'gzip')
-				return zlib.gzipSync(data)
+				buffer.pipe(zlib.createGzip()).pipe(res)
 			} else if(e.match(/deflate/)) {
 				res.setHeader('content-encoding', 'deflate')
-				return zlib.deflateSync(data)
+				buffer.pipe(zlib.createDeflate()).pipe(res)
+			} else {
+				buffer.pipe(res)
 			}
-
-			return data
 		}
-		, zip = (data, ...args) => send(encode(data), ...args)
 
-	return {...context, send: zip}
+	return {...context, send: s}
 }
 
 // routing middleware
@@ -155,33 +150,43 @@ export const patch = route('patch')
 
 // static file serving async-middleware
 export const serve = (folder='./', route='/') => context => {
-	const {req, res, send, sendFile} = context
+	const {req, res} = context
 		, {url} = req
 		, filepath = `${process.cwd()}/${folder}/${url.slice(1).replace(new RegExp(`/^${route}/`,`ig`), '')}`.replace(/\/\//ig, '/')
+		, e = req.headers['accept-encoding'] || ''
 
 	return new Promise((y, n) =>
 		fs.stat(filepath, (err, stats) => {
 			if(!err && stats.isFile()){
-				return fs.readFile(filepath, (err, data) => {
-					addMIME(url, res)
-					send(data.toString())
-					n(context)
-				})
+				addMIME(url, res)
+
+				if(e.match(/gzip/)) {
+					res.setHeader('content-encoding', 'gzip')
+					fs.createReadStream(filepath).pipe(zlib.createGzip()).pipe(res)
+				} else if(e.match(/deflate/)) {
+					res.setHeader('content-encoding', 'deflate')
+					fs.createReadStream(filepath).pipe(zlib.createDeflate()).pipe(res)
+				} else {
+					fs.createReadStream(filepath).pipe(res)
+				}
+
+				n(context)
+			} else {
+				y(context)
 			}
-			y(context)
 		}))
 }
 
 const addMIME = (url, res, type) => {
-		url.match(/\.js$/) && res.setHeader('Content-Type', 'text/javascript')
-		url.match(/\.json$/) && res.setHeader('Content-Type', 'application/json')
-		url.match(/\.pdf$/) && res.setHeader('Content-Type', 'application/pdf')
-		url.match(/\.html$/) && res.setHeader('Content-Type', 'text/html')
-		url.match(/\.css$/) && res.setHeader('Content-Type', 'text/css')
+	url.match(/\.js$/) && res.setHeader('Content-Type', 'text/javascript')
+	url.match(/\.json$/) && res.setHeader('Content-Type', 'application/json')
+	url.match(/\.pdf$/) && res.setHeader('Content-Type', 'application/pdf')
+	url.match(/\.html$/) && res.setHeader('Content-Type', 'text/html')
+	url.match(/\.css$/) && res.setHeader('Content-Type', 'text/css')
 
-		url.match(/\.jpe?g$/) && res.setHeader('Content-Type', 'image/jpeg')
-		url.match(/\.png$/) && res.setHeader('Content-Type', 'image/png')
-		url.match(/\.gif$/) && res.setHeader('Content-Type', 'image/gif')
+	url.match(/\.jpe?g$/) && res.setHeader('Content-Type', 'image/jpeg')
+	url.match(/\.png$/) && res.setHeader('Content-Type', 'image/png')
+	url.match(/\.gif$/) && res.setHeader('Content-Type', 'image/gif')
 }
 
 export const server = (pipe, port=3000, useCluster=false) => {
