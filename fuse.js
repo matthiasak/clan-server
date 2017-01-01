@@ -2,25 +2,25 @@ const f = require("fuse-box")
 	, chokidar = require('chokidar')
 	, dev = process.env.NODE_ENV !== 'production'
 
-let rootConfig = {
+let c = {
 	homeDir: "src/"
 	, cache: dev
 	, package: 'clan-server'
 	, globals: { 'default': 'clan-server' }
+	, sourceMap: {
+		bundleReference: "index.js.map"
+		, outFile: "./build/index.js.map"
+	}
+	, outFile: "./build/index.js"
+	, inFile: "[index.js]"
 	, plugins: (browser) =>
 		[
 		f.BabelPlugin({
-			// limit2project: false
-			// , test: /\.js$/
 			config: {
 				sourceMaps: true
 				, presets:
 					(dev ? [] : ['babili'])
-					.concat([
-						// 'react'
-						'latest'
-						// , 'stage-0'
-					])
+					.concat(['latest'])
 				, plugins: [
 					"fast-async"
 				]
@@ -29,28 +29,16 @@ let rootConfig = {
 		]
 }
 
-let configs = [
-	{
-		sourceMap: {
-			bundleReference: "server.js.map"
-			, outFile: "./build/server.js.map"
-		}
-		, outFile: "./build/server.js"
-		, inFile: "[./**/*.js]"
-	}
-]
+const processAll = $ => {
+	let d = Object.assign({}, c)
+		, inFile = d.inFile
 
-const processAll = $ =>
-	configs.map(c => {
-		let d = Object.assign({}, rootConfig, c)
-			, inFile = d.inFile
+	d.plugins = d.plugins(d.browser || false)
+	delete d.inFile
+	delete d.browser
 
-		d.plugins = d.plugins(d.browser || false)
-		delete d.inFile
-		delete d.browser
-
-		f.FuseBox.init(d).bundle(inFile)
-	})
+	f.FuseBox.init(d).bundle(inFile)
+}
 
 const debounce = (func, wait, immediate, timeout) =>
 	() => {
