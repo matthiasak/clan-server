@@ -18,9 +18,8 @@ let c = {
 		f.BabelPlugin({
 			config: {
 				sourceMaps: true
-				, presets:
-					(dev ? [] : ['babili'])
-					.concat(['latest'])
+				, presets: ['latest']
+				// , env: { production: {presets: ['babili'] }}
 				, plugins: [
 					"fast-async"
 				]
