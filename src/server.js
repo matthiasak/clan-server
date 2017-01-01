@@ -32,7 +32,7 @@ export const cookie = context => {
 		}
 		, clearCookie = () => context.res.setHeader('Set-Cookie', '')
 
-	return {...context, cookie: c, clearCookie}
+	return Object.assign({}, context, {cookie: c, clearCookie})
 }
 
 // send gzipped file
@@ -46,7 +46,7 @@ export const sendFile = context => {
 			: fs.createReadStream(file).pipe(zlib.createGzip()).pipe(res)
 	}
 
-	return {...context, sendFile: s}
+	return Object.assign({}, context, {sendFile: s})
 }
 
 // benchmark handler
@@ -118,7 +118,7 @@ export const send = context => {
 			}
 		}
 
-	return {...context, send: s}
+	return Object.assign({}, context, {send: s})
 }
 
 // routing middleware
@@ -137,7 +137,7 @@ export const route = type => (url, action) => context => {
 		const params = v.slice(1)
 			, query = qs.parse(req.url.slice(i+1))
 
-		action({...context, params, query})
+		action(Object.assign({}, context, {params, query}))
 	}
 
 	return context
