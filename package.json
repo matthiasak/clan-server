@@ -9,7 +9,8 @@
     "start": "node fuse",
     "prebuild": "rimraf .fusebox build",
     "build": "cross-env NODE_ENV=production node fuse",
-    "deploy": "npm run build; git add .; git commit -am \"comitting and pushing new patch version\"; npm version patch; git push origin --all; npm publish;"
+    "push": "git add . && git commit -am \"comitting and pushing new patch version\" && git push origin --all",
+    "deploy": "npm run build && npm run push && npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
