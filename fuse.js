@@ -6,7 +6,7 @@ let c = {
 	homeDir: "src/"
 	, cache: dev
 	, package: 'clan-server'
-	, globals: { 'default': 'clan-server' }
+	, globals: { 'clan-server': 'clan-server' }
 	, sourceMap: {
 		bundleReference: "index.js.map"
 		, outFile: "./build/index.js.map"
