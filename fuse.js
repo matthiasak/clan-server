@@ -6,13 +6,13 @@ let c = {
 	homeDir: "src/"
 	, cache: dev
 	, package: 'clan-server'
-	, globals: { 'clan-server': 'clan-server' }
+	, globals: { default: 'clan-server' }
 	, sourceMap: {
 		bundleReference: "index.js.map"
 		, outFile: "./build/index.js.map"
 	}
 	, outFile: "./build/index.js"
-	, inFile: "[index.js]"
+	, inFile: "> index.js [**/*.js]"
 	, plugins: (browser) =>
 		[
 		f.BabelPlugin({
@@ -20,9 +20,7 @@ let c = {
 				sourceMaps: true
 				, presets: ['latest']
 				// , env: { production: {presets: ['babili'] }}
-				, plugins: [
-					"fast-async"
-				]
+				, plugins: ["fast-async"]
 			}
 		})
 		]
