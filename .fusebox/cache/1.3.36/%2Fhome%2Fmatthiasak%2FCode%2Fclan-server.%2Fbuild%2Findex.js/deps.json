@@ -1,0 +1,141 @@
+{
+  "tree": {
+    "zlib@0.0.0": {
+      "deps": {},
+      "name": "zlib",
+      "version": "0.0.0"
+    },
+    "fs@0.0.0": {
+      "deps": {},
+      "name": "fs",
+      "version": "0.0.0"
+    },
+    "querystring@0.0.0": {
+      "deps": {},
+      "name": "querystring",
+      "version": "0.0.0"
+    },
+    "stream@0.0.0": {
+      "deps": {},
+      "name": "stream",
+      "version": "0.0.0"
+    },
+    "buffer@5.0.2": {
+      "deps": {
+        "base64-js@1.2.0": {
+          "deps": {},
+          "name": "base64-js",
+          "version": "1.2.0"
+        },
+        "ieee754@1.1.8": {
+          "deps": {},
+          "name": "ieee754",
+          "version": "1.1.8"
+        }
+      },
+      "name": "buffer",
+      "version": "5.0.2"
+    },
+    "clan-fp@0.0.0": {
+      "deps": {},
+      "name": "clan-fp",
+      "version": "0.0.0"
+    },
+    "http@0.0.0": {
+      "deps": {},
+      "name": "http",
+      "version": "0.0.0"
+    },
+    "cluster@0.0.0": {
+      "deps": {},
+      "name": "cluster",
+      "version": "0.0.0"
+    },
+    "os@0.0.0": {
+      "deps": {},
+      "name": "os",
+      "version": "0.0.0"
+    },
+    "process@0.0.0": {
+      "deps": {},
+      "name": "process",
+      "version": "0.0.0"
+    }
+  },
+  "flat": {
+    "zlib@0.0.0": {
+      "name": "zlib",
+      "version": "0.0.0",
+      "files": []
+    },
+    "fs@0.0.0": {
+      "name": "fs",
+      "version": "0.0.0",
+      "files": [
+        "index.js"
+      ]
+    },
+    "querystring@0.0.0": {
+      "name": "querystring",
+      "version": "0.0.0",
+      "files": []
+    },
+    "stream@0.0.0": {
+      "name": "stream",
+      "version": "0.0.0",
+      "files": [
+        "index.js"
+      ]
+    },
+    "buffer@5.0.2": {
+      "name": "buffer",
+      "version": "5.0.2",
+      "files": [
+        "index.js"
+      ]
+    },
+    "base64-js@1.2.0": {
+      "name": "base64-js",
+      "version": "1.2.0",
+      "files": [
+        "index.js"
+      ]
+    },
+    "ieee754@1.1.8": {
+      "name": "ieee754",
+      "version": "1.1.8",
+      "files": [
+        "index.js"
+      ]
+    },
+    "clan-fp@0.0.0": {
+      "name": "clan-fp",
+      "version": "0.0.0",
+      "files": []
+    },
+    "http@0.0.0": {
+      "name": "http",
+      "version": "0.0.0",
+      "files": [
+        "index.js"
+      ]
+    },
+    "cluster@0.0.0": {
+      "name": "cluster",
+      "version": "0.0.0",
+      "files": []
+    },
+    "os@0.0.0": {
+      "name": "os",
+      "version": "0.0.0",
+      "files": []
+    },
+    "process@0.0.0": {
+      "name": "process",
+      "version": "0.0.0",
+      "files": [
+        "index.js"
+      ]
+    }
+  }
+}
