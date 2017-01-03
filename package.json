@@ -49,8 +49,5 @@
   },
   "peerDependencies": {
     "clan-fp": "^0.0.33"
-  },
-  "engines": {
-    "node": ">=7"
   }
 }
