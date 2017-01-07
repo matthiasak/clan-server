@@ -1,6 +1,6 @@
 {
   "name": "clan-server",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "A functional, observable-and-worker-backed hyper simple framework with slightly opinionated use-cases",
   "main": "build/index.js",
   "module": "src/index.js",
