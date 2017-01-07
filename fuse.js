@@ -16,7 +16,7 @@ let c = {
 	, inFile: "> index.ts"
 	, plugins: [
 		f.TypeScriptHelpers()
-		, !dev && closure()
+		// , !dev && closure()
 	].filter(x => !!x)
 }
 
