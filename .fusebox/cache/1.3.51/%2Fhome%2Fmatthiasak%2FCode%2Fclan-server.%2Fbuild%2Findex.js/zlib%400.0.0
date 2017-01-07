@@ -1,0 +1,11 @@
+FuseBox.pkg("zlib", {}, function(___scope___){
+___scope___.file("index.js", function(exports, require, module, __filename, __dirname){ 
+
+if (FuseBox.isServer) {
+    module.exports = global.require("zlib");
+} else {
+    module.exports = {}
+}
+});
+return ___scope___.entry = "index.js";
+});
