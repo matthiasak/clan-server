@@ -8,4 +8,4 @@ coverage
 .grunt
 .lock-wscript
 node_modules
-.fuse-box
+.fusebox
