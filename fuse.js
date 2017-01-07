@@ -7,7 +7,7 @@ let c = {
 	homeDir: "src/"
 	, cache: dev
 	, package: 'clan-fp'
-	, globals: { 'clan-fp': 'clan-fp' }
+	, globals: { default: 'clan-fp' }
 	, sourceMap: {
 		bundleReference: "index.js.map"
 		, outFile: "./build/index.js.map"
