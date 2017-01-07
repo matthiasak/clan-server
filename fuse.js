@@ -6,8 +6,8 @@ const f = require("fuse-box")
 let c = {
 	homeDir: "src/"
 	, cache: dev
-	, package: 'clan-fp'
-	, globals: { default: 'clan-fp' }
+	, package: 'clan-server'
+	, globals: { default: 'clan-server' }
 	, sourceMap: {
 		bundleReference: "index.js.map"
 		, outFile: "./build/index.js.map"
