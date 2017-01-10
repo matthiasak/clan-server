@@ -152,13 +152,16 @@ export const patch = route('patch')
 export const serve = (folder='./', route='/') => context => {
 	const {req, res} = context
 		, {url} = req
-		, filepath = `${process.cwd()}/${folder}/${url.slice(1).replace(new RegExp(`/^${route}/`,`ig`), '')}`.replace(/\/\//ig, '/')
+		, q = url.indexOf('?')
+		, hash = url.indexOf('#')
+		, _url = url.slice(0, q !== -1 ? q : (hash !== -1 ? hash : undefined))
+		, filepath = `${process.cwd()}/${folder}/${_url.slice(1).replace(new RegExp(`/^${route}/`,`ig`), '')}`.replace(/\/\//ig, '/')
 		, e = req.headers['accept-encoding'] || ''
 
 	return new Promise((y, n) =>
 		fs.stat(filepath, (err, stats) => {
 			if(!err && stats.isFile()){
-				addMIME(url, res)
+				addMIME(_url, res)
 
 				if(e.match(/gzip/)) {
 					res.setHeader('content-encoding', 'gzip')
