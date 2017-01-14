@@ -146,14 +146,16 @@ exports.serve = (folder = './', route = '/') => context => {
     }));
 };
 const addMIME = (url, res, type) => {
-    url.match(/\.js$/) && res.setHeader('Content-Type', 'text/javascript');
-    url.match(/\.json$/) && res.setHeader('Content-Type', 'application/json');
-    url.match(/\.pdf$/) && res.setHeader('Content-Type', 'application/pdf');
-    url.match(/\.html$/) && res.setHeader('Content-Type', 'text/html');
-    url.match(/\.css$/) && res.setHeader('Content-Type', 'text/css');
-    url.match(/\.jpe?g$/) && res.setHeader('Content-Type', 'image/jpeg');
-    url.match(/\.png$/) && res.setHeader('Content-Type', 'image/png');
-    url.match(/\.gif$/) && res.setHeader('Content-Type', 'image/gif');
+    const c = 'Content-Type';
+    url.match(/\.js$/) && res.setHeader(c, 'text/javascript');
+    url.match(/\.json$/) && res.setHeader(c, 'application/json');
+    url.match(/\.pdf$/) && res.setHeader(c, 'application/pdf');
+    url.match(/\.html$/) && res.setHeader(c, 'text/html');
+    url.match(/\.css$/) && res.setHeader(c, 'text/css');
+    url.match(/\.jpe?g$/) && res.setHeader(c, 'image/jpeg');
+    url.match(/\.png$/) && res.setHeader(c, 'image/png');
+    url.match(/\.gif$/) && res.setHeader(c, 'image/gif');
+    url.match(/\.svg$/) && res.setHeader(c, 'image/svg+xml');
 };
 exports.server = (pipe, port = 3000, useCluster = false) => {
     const http = require('http');

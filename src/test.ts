@@ -1,10 +1,6 @@
 import {server, cookie, send, sendFile, serve, gzip, route, get, put, post, patch, del} from './server'
 import {obs} from 'clan-fp'
 
-if(module.hot){
-	module.hot.accept()
-}
-
 const log = (...a) => console.log(...a)
 
 const benchmark = message => context => {
