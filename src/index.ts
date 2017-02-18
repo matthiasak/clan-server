@@ -123,7 +123,7 @@ export const send = context => {
 
 // routing middleware
 export const route = type => (url, action) => context => {
-	if(context.__handled || context.res.headersSent || context.req.method.toLowerCase() !== type) return
+	if(context.__handled || context.res.headersSent || context.req.method.toLowerCase() !== type) return context
 
 	const {req, res} = context
 		, reggie = url.replace(/\/\{((\w*)(\??))\}/ig, '\/?(\\w+$3)')

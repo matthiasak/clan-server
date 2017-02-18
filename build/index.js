@@ -112,7 +112,7 @@ exports.send = function (context) {
 // routing middleware
 exports.route = function (type) { return function (url, action) { return function (context) {
     if (context.__handled || context.res.headersSent || context.req.method.toLowerCase() !== type)
-        return;
+        return context;
     var req = context.req, res = context.res, reggie = url.replace(/\/\{((\w*)(\??))\}/ig, '\/?(\\w+$3)'), r = RegExp("^" + reggie + "$"), i = req.url.indexOf('?'), v = r.exec(i === -1 ? req.url : req.url.slice(0, i));
     if (!!v) {
         context.__handled = true;
