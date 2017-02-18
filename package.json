@@ -5,10 +5,10 @@
   "main": "build/index.js",
   "module": "src/index.js",
   "scripts": {
-    "prestart": "rimraf build",
-    "start": "tsc -w",
+    "prestart": "rimraf build/*",
+    "start": "tsc -w src/index.ts --outDir build",
     "prebuild": "rimraf build",
-    "build": "cross-env NODE_ENV=production tsc; echo 'done.';",
+    "build": "cross-env NODE_ENV=production tsc src/index.ts --outDir build; echo 'done.';",
     "push": "git add . && git commit -am \"comitting and pushing new patch version\" && git push origin --all",
     "deploy": "npm-run-all build push n",
     "deploy-r": "npm-run-all build push n release",
