@@ -9,11 +9,10 @@
     "start": "tsc -w src/index.ts --outDir build -d",
     "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc src/index.ts --outDir build -d; echo 'done.';",
-    "push": "git add . && git commit -am \"comitting and pushing new patch version\" && git push origin --all",
-    "deploy": "npm-run-all build push n",
-    "deploy-r": "npm-run-all build push n release",
-    "n": "npm version patch && npm publish",
-    "release": "release"
+    "commit": "git add . && git commit -am \"comitting and pushing new patch version\"",
+    "push": "git push origin --all",
+    "deploy": "npm-run-all build commit n push",
+    "n": "npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
@@ -37,6 +36,6 @@
     "typescript": "^2.1.4"
   },
   "dependencies": {
-    "clan-fp": "^0.0.47"
+    "clan-fp": "^0.0.49"
   }
 }
