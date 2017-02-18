@@ -1,0 +1,11 @@
+{
+	"compileOnSave": true,
+    "compilerOptions": {
+        "target": "ESNext",
+        "sourceMap": true,
+        "module": "CommonJs",
+        "removeComments": true,
+        "declaration": true,
+        "outDir": "build"
+    }
+}
