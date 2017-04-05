@@ -1,4 +1,5 @@
 "use strict";
+exports.__esModule = true;
 var zlib = require('zlib'), fs = require('fs'), qs = require('querystring'), stream = require('stream'), Buffer = require('buffer').Buffer, _a = require('clan-fp'), model = _a.model, hamt = _a.hamt, obs = _a.obs, worker = _a.worker, cof = _a.cof, cob = _a.cob, curry = _a.curry, batch = _a.batch, c = _a.c, concatter = _a.concatter, filtering = _a.filtering, mapping = _a.mapping, pf = _a.pf, rAF = _a.rAF, vdom = _a.vdom;
 var log = function () {
     var a = [];

@@ -27,13 +27,13 @@
   "author": "@matthiasak",
   "license": "MIT",
   "devDependencies": {
-    "cross-env": "^3.1.3",
-    "npm-run-all": "^4.0.0",
+    "cross-env": "^4.0.0",
+    "npm-run-all": "^4.0.2",
     "release": "^1.0.6",
-    "rimraf": "^2.5.4",
-    "typescript": "^2.1.4"
+    "rimraf": "^2.6.1",
+    "typescript": "^2.2.2"
   },
   "dependencies": {
-    "clan-fp": "^0.0.49"
+    "clan-fp": "^0.0.58"
   }
 }
