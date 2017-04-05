@@ -127,15 +127,27 @@ exports.post = exports.route('post');
 exports.del = exports.route('delete');
 exports.patch = exports.route('patch');
 // static file serving async-middleware
-exports.serve = function (folder, route) {
+exports.serve = function (folder, route, cache, age) {
     if (folder === void 0) { folder = './'; }
     if (route === void 0) { route = '/'; }
+    if (cache === void 0) { cache = true; }
+    if (age === void 0) { age = 2628000; }
     return function (context) {
         var req = context.req, res = context.res, url = req.url, q = url.indexOf('?'), hash = url.indexOf('#'), _url = url.slice(0, q !== -1 ? q : (hash !== -1 ? hash : undefined)), filepath = (process.cwd() + "/" + folder + "/" + _url.slice(1).replace(new RegExp("/^" + route + "/", "ig"), '')).replace(/\/\//ig, '/'), e = req.headers['accept-encoding'] || '';
         return new Promise(function (y, n) {
             return fs.stat(filepath, function (err, stats) {
                 if (!err && stats.isFile()) {
                     addMIME(_url, res);
+                    if (!cache) {
+                        x.res.setHeader('cache-control', 'no-cache, no-store, must-revalidate');
+                        x.res.setHeader('Pragma', 'no-cache');
+                        x.res.setHeader('Expires', '-1');
+                    }
+                    else {
+                        x.res.setHeader('cache-control', "public, max-age=" + age);
+                        x.res.setHeader('Pragma', 'cache');
+                        x.res.setHeader('Expires', new Date(+new Date + age * 1000).toUTCString());
+                    }
                     if (e.match(/gzip/)) {
                         res.setHeader('content-encoding', 'gzip');
                         fs.createReadStream(filepath).pipe(zlib.createGzip()).pipe(res);
