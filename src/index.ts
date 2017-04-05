@@ -164,13 +164,13 @@ export const serve = (folder='./', route='/', cache=true, age = 2628000) => cont
                 addMIME(_url, res)
 
                 if(!cache){
-                    x.res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
-                    x.res.setHeader('Pragma', 'no-cache')
-                    x.res.setHeader('Expires', '-1')
+                    res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
+                    res.setHeader('Pragma', 'no-cache')
+                    res.setHeader('Expires', '-1')
                 } else {
-                    x.res.setHeader('cache-control', `public, max-age=${age}`)
-                    x.res.setHeader('Pragma', 'cache')
-                    x.res.setHeader('Expires', new Date(+new Date + age*1000).toUTCString())
+                    res.setHeader('cache-control', `public, max-age=${age}`)
+                    res.setHeader('Pragma', 'cache')
+                    res.setHeader('Expires', new Date(+new Date + age*1000).toUTCString())
                 }
 
                 if(e.match(/gzip/)) {
