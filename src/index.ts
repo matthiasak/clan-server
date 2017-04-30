@@ -3,7 +3,8 @@ const zlib = require('zlib')
     , qs = require('querystring')
     , stream = require('stream')
     , Buffer = require('buffer').Buffer
-    , { model, hamt, obs, worker, cof, cob, curry, batch, c, concatter, filtering, mapping, pf, rAF, vdom } = require('clan-fp')
+    , etag = require('etag')
+    , { obs } = require('clan-fp')
 
 const log = (...a) => console.log(...a)
 
@@ -93,6 +94,7 @@ const streamable = buf => {
 // send gzipped response middleware
 export const send = context => {
     const { req, res } = context
+        , ifNoneMatch = req.headers['If-None-Match']
         , e = req.headers['accept-encoding'] || ''
         , s = (buffer, code=200) => {
             if(typeof buffer === 'number') {
@@ -104,6 +106,12 @@ export const send = context => {
 
             if(!(buffer instanceof Buffer))
                 buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer)
+
+            let etag_buf = res.setHeader('ETag', etag(buffer))
+            if(etag_buf === ifNoneMatch){
+                res.statusCode = 304 // not modified
+                return res.end('')
+            }
 
             buffer = streamable(buffer)
 

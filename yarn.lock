@@ -175,9 +175,9 @@ child-process-promise@^2.1.3:
     node-version "^1.0.0"
     promise-polyfill "^6.0.1"
 
-clan-fp@^0.0.58:
-  version "0.0.58"
-  resolved "https://registry.yarnpkg.com/clan-fp/-/clan-fp-0.0.58.tgz#65be72483da090dfc2add3d51313fadbb1ca56d5"
+clan-fp@^0.0.63:
+  version "0.0.63"
+  resolved "https://registry.yarnpkg.com/clan-fp/-/clan-fp-0.0.63.tgz#dd93142bfd321bbdd5e79907642a062b46239f7c"
 
 cli-boxes@^1.0.0:
   version "1.0.0"
@@ -259,15 +259,7 @@ cross-spawn@^4.0.2:
     lru-cache "^4.0.1"
     which "^1.2.9"
 
-cross-spawn@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.0.1.tgz#a3bbb302db2297cbea3c04edf36941f4613aa399"
-  dependencies:
-    lru-cache "^4.0.1"
-    shebang-command "^1.2.0"
-    which "^1.2.9"
-
-cross-spawn@^5.1.0:
+cross-spawn@^5.0.1, cross-spawn@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
   dependencies:
@@ -374,6 +366,10 @@ es-to-primitive@^1.1.1:
 escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
+
+etag@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.0.tgz#6f631aef336d6c46362b51764044ce216be3c051"
 
 event-stream@~3.3.0:
   version "3.3.4"

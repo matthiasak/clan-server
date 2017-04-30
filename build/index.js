@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-var zlib = require('zlib'), fs = require('fs'), qs = require('querystring'), stream = require('stream'), Buffer = require('buffer').Buffer, _a = require('clan-fp'), model = _a.model, hamt = _a.hamt, obs = _a.obs, worker = _a.worker, cof = _a.cof, cob = _a.cob, curry = _a.curry, batch = _a.batch, c = _a.c, concatter = _a.concatter, filtering = _a.filtering, mapping = _a.mapping, pf = _a.pf, rAF = _a.rAF, vdom = _a.vdom;
+var zlib = require('zlib'), fs = require('fs'), qs = require('querystring'), stream = require('stream'), Buffer = require('buffer').Buffer, etag = require('etag'), obs = require('clan-fp').obs;
 var log = function () {
     var a = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -84,7 +84,7 @@ var streamable = function (buf) {
 };
 // send gzipped response middleware
 exports.send = function (context) {
-    var req = context.req, res = context.res, e = req.headers['accept-encoding'] || '', s = function (buffer, code) {
+    var req = context.req, res = context.res, ifNoneMatch = req.headers['If-None-Match'], e = req.headers['accept-encoding'] || '', s = function (buffer, code) {
         if (code === void 0) { code = 200; }
         if (typeof buffer === 'number') {
             res.statusCode = buffer;
@@ -95,6 +95,11 @@ exports.send = function (context) {
         }
         if (!(buffer instanceof Buffer))
             buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer);
+        var etag_buf = res.setHeader('ETag', etag(buffer));
+        if (etag_buf === ifNoneMatch) {
+            res.statusCode = 304; // not modified
+            return res.end('');
+        }
         buffer = streamable(buffer);
         if (e.match(/gzip/)) {
             res.setHeader('content-encoding', 'gzip');

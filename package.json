@@ -6,6 +6,7 @@
   "scripts": {
     "prestart": "rimraf build/*",
     "start": "tsc -w src/index.ts --outDir build -d",
+    "test": "tsc -w src/*.ts --outDir build -d",
     "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc src/index.ts --outDir build -d; echo 'done.';",
     "commit": "git add . && git commit -am \"comitting and pushing new patch version\"",
@@ -34,6 +35,7 @@
     "typescript": "^2.2.2"
   },
   "dependencies": {
-    "clan-fp": "^0.0.58"
+    "clan-fp": "^0.0.63",
+    "etag": "^1.8.0"
   }
 }
