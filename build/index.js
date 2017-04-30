@@ -84,7 +84,7 @@ var streamable = function (buf) {
 };
 // send gzipped response middleware
 exports.send = function (context) {
-    var req = context.req, res = context.res, ifNoneMatch = req.headers['If-None-Match'], e = req.headers['accept-encoding'] || '', s = function (buffer, code) {
+    var req = context.req, res = context.res, ifNoneMatch = req.headers['if-none-match'], e = req.headers['accept-encoding'] || '', s = function (buffer, code) {
         if (code === void 0) { code = 200; }
         if (typeof buffer === 'number') {
             res.statusCode = buffer;
@@ -95,11 +95,12 @@ exports.send = function (context) {
         }
         if (!(buffer instanceof Buffer))
             buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer);
-        var etag_buf = res.setHeader('ETag', etag(buffer));
-        if (etag_buf === ifNoneMatch) {
+        var etag_buf = etag(buffer);
+        if (etag_buf && ifNoneMatch && etag_buf === ifNoneMatch) {
             res.statusCode = 304; // not modified
             return res.end('');
         }
+        res.setHeader('ETag', etag_buf);
         buffer = streamable(buffer);
         if (e.match(/gzip/)) {
             res.setHeader('content-encoding', 'gzip');

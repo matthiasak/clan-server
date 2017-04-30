@@ -5,8 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "prestart": "rimraf build/*",
-    "start": "tsc -w src/index.ts --outDir build -d",
-    "test": "tsc -w src/*.ts --outDir build -d",
+    "start": "tsc -w src/*.ts --outDir build -d",
     "prebuild": "rimraf build",
     "build": "cross-env NODE_ENV=production tsc src/index.ts --outDir build -d; echo 'done.';",
     "commit": "git add . && git commit -am \"comitting and pushing new patch version\"",

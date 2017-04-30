@@ -94,7 +94,7 @@ const streamable = buf => {
 // send gzipped response middleware
 export const send = context => {
     const { req, res } = context
-        , ifNoneMatch = req.headers['If-None-Match']
+        , ifNoneMatch = req.headers['if-none-match']
         , e = req.headers['accept-encoding'] || ''
         , s = (buffer, code=200) => {
             if(typeof buffer === 'number') {
@@ -107,12 +107,13 @@ export const send = context => {
             if(!(buffer instanceof Buffer))
                 buffer = Buffer.from(typeof buffer === 'object' ? JSON.stringify(buffer) : buffer)
 
-            let etag_buf = res.setHeader('ETag', etag(buffer))
-            if(etag_buf === ifNoneMatch){
+            let etag_buf = etag(buffer)
+            if(etag_buf && ifNoneMatch && etag_buf === ifNoneMatch){
                 res.statusCode = 304 // not modified
                 return res.end('')
             }
 
+            res.setHeader('ETag', etag_buf)
             buffer = streamable(buffer)
 
             if(e.match(/gzip/)) {
