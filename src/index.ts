@@ -160,6 +160,7 @@ export const patch = route('patch')
 // static file serving async-middleware
 export const serve = (folder='./', route='/', cache=true, age = 2628000) => context => {
     const {req, res} = context
+        , ifNoneMatch = req.headers['if-none-match']
         , {url} = req
         , q = url.indexOf('?')
         , hash = url.indexOf('#')
@@ -170,6 +171,14 @@ export const serve = (folder='./', route='/', cache=true, age = 2628000) => cont
     return new Promise((y, n) =>
         fs.stat(filepath, (err, stats) => {
             if(!err && stats.isFile()){
+                let etag_buf = etag(stats)
+                if(etag_buf && ifNoneMatch && etag_buf === ifNoneMatch){
+                    res.statusCode = 304 // not modified
+                    res.end('')
+                    return n(context)
+                }
+                res.setHeader('ETag', etag_buf)
+
                 addMIME(_url, res)
 
                 if(!cache){

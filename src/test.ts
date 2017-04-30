@@ -20,7 +20,7 @@ start
     .map(benchmark())
     .map(send)
     .map(cookie)
-    .maybe(serve('../src'))[0]
+    .maybe(serve('src/'))[0]
     .map(get('/', ctx => ctx.send('hello world')))
     .map(get('/api', c => c.send('api page '+Math.random())))
     .map(get('/notes', c => c.send(`main notes page`)))
